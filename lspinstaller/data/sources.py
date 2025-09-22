@@ -43,9 +43,13 @@ The binary object contains the following keys:
   the version. See kotlin-lsp for an example. Mutually exclusive with `pattern`
 * `link`: describes which files to symlink to the special bin directory.
   Syntax: `"file name in lsp/bin": "filename relative to download root"`
+  Currently does nothing due to a severe bug where symlinks break the binary.
 * `archive`: the archive type. Required. Accepted values: "zip".
-* `is_nested`: whether or not the archive is nested. Required if `archive` is
-  set
+* `is_nested`: whether or not the archive is nested, meaning the main archive
+  has an inner folder. Clangd, for example, has this, where extracting the
+  clangd archive extracts another clangd-<version> folder. Clangd therefore
+  sets this to true. kotlin-lsp, on the other hand, just has its bin directory
+  immediately after extraction, so it sets false. Required if `archive` is set
 
 The binary object is special, and will never be executed standalone. It exists
 to consume data from other providers to actually do the install.
@@ -59,8 +63,14 @@ and the currently recognised values are:
 * `version`: the version as determined by a provider. Note that for versions
   including the `v` prefix, the `v` is stripped and must be included literally
   in the resulting string.
-
 """
+# TODO: need a better way to manage the logic for some of these variables,
+# because they are not universally portable. Just with operating systems,
+# upper-case first letter does occur in some projects. Some also abbreviate
+# windows. Can probably sneak in more lambdas to mitigate this, but  that
+# requires passing the whole data object  to the lambda, which is just a mess.
+# Lambdas in python are also fairly shit, so that wouldn't be pretty. Maybe
+# there's a light-weight templating language that makes sense to use?
 sources = {
     "clangd": {
         "github": {
