@@ -43,7 +43,8 @@ The binary object contains the following keys:
   the version. See kotlin-lsp for an example. Mutually exclusive with `pattern`
 * `link`: describes which files to symlink to the special bin directory.
   Syntax: `"file name in lsp/bin": "filename relative to download root"`
-  Currently does nothing due to a severe bug where symlinks break the binary.
+  Currently only used to chmod executables, may be turned into a list if
+  symlinking proves undoable.
 * `archive`: the archive type. Required. Accepted values: "zip".
 * `is_nested`: whether or not the archive is nested, meaning the main archive
   has an inner folder. Clangd, for example, has this, where extracting the

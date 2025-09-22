@@ -25,6 +25,14 @@ pip3 install lspinstaller
 ### From source
 IOU 1x instruction set
 
+## General usage
+
+* `lspinstaller list` to see what exists
+* `lspinstaller update` to update LSPs you have installed
+* `lspinstaller install <lsp>` to install new LSPs
+
+All of these accept `--help`. Additional information is available through `lspinstaller --help`.
+
 ## FAQ
 
 ### What LSP servers are supported, and how do I install them?
