@@ -14,6 +14,17 @@ Additionally, the following tools are used, but are optional unless you install 
 
 * `npm`
 
+## Installing
+
+### From pypi
+https://pypi.org/project/lspinstaller/
+```
+pip3 install lspinstaller
+```
+
+### From source
+IOU 1x instruction set
+
 ## FAQ
 
 ### What LSP servers are supported, and how do I install them?
