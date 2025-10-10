@@ -46,7 +46,7 @@ To install a server, run `lspinstaller install server-name`, where `server-name`
 Depending on availability:
 
 1. Binary install
-2. Npm install
+2. Npm install (requires `npm` in PATH)
 
 System package managers are not supported; if you can install via a system package manager, do that instead. This script exists for operating systems where there are no package manager, the package manager doesn't include a given LSP, or the OS is debian-based (or follows a debian-like idiology) where the LSPs that are available are heavily out of date. 
 
