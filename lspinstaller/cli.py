@@ -10,6 +10,7 @@ from lspinstaller.resolver.resolver import resolve
 from .data import sources
 
 class Arguments(argparse.Namespace):
+    package: str | None
     packages: list[str] | None
 
 
@@ -76,11 +77,56 @@ def run_install(args):
 def run_update(_args):
     pass
 
+def find_package(args):
+    package = args.package
+    assert package is not None
+    assert isinstance(package, list)
+    package = package[0]
+
+    if package not in sources:
+        exit(-2)
+
+    spec = sources[package]
+
+    expected_path: str
+    if "npm" in spec:
+        expected_path = os.path.join(
+            LSP_HOME,
+            "node_modules",
+            ".bin",
+            spec["npm"]["bin"]
+        )
+    elif "binary" in spec:
+        expected_path = os.path.join(
+            LSP_HOME,
+            package,
+            list(spec["binary"]["link"].values())[0]
+        )
+    else:
+        exit(-3)
+
+    if not os.path.exists(expected_path):
+        exit(-1)
+    print(expected_path)
+
+
+
 def start_cli():
     parser = argparse.ArgumentParser(
         prog="lspinstaller",
-        description="Installs (some) LSP servers",
+        description="""Installs (some) LSP servers.
+
+Some special identifiers:
+* QUIET: Indicates a CLI that will not change in any way, and
+  that's explicitly intended for use with scripts.
+  Note that commands not labelled as STABLE can still be used with CLI use, but
+  because that isn't the explicit intent, they'll have a lot more output.
+
+  Stable CLIs are guaranteed to work with $(lsp command ...args) in shell
+  without needing any additional tweaking.
+""",
         epilog="lspinstaller is licensed under the MIT license: https://codeberg.org/LunarWatcher/lspinstaller/src/branch/master/LICENSE",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     subs = parser.add_subparsers(required=True)
@@ -106,6 +152,27 @@ def start_cli():
         help="Updates all LSP servers"
     )
     cmd_update.set_defaults(func=run_update)
+
+    cmd_find = subs.add_parser(
+        "find",
+        help="QUIET: Returns the path of an LSP server. This CLI is guaranteed to "
+        "never change, as it's intended for scripting purposes. For example, "
+        "$(lsp find luals) will always return the absolute path to luals, "
+        "or exit with -1 if luals is not installed."
+    )
+    cmd_find.add_argument(
+        "package",
+        nargs=1,
+        help="The package to find",
+    )
+    cmd_find.set_defaults(func=find_package)
+
+    cmd_home = subs.add_parser(
+        "home",
+        help="QUIET: Prints the path to the lsp root dir."
+    )
+    cmd_home.set_defaults(func=lambda _: print(LSP_HOME))
+
 
     args: Arguments = parser.parse_args()
     args.func(args)

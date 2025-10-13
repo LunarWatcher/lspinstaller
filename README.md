@@ -4,10 +4,19 @@ Utility script for installing various LSPs, because software packaging standards
 
 **Warning:** this is an experimental script that has not been extensively tested. Use with caution. It was hacked together in a single evening/night, and likely has multiple, large problems.
 
+<!-- If this list ever gets Sufficiently Big:tm:, replace with "has support for over X servers, including:" and only some notable examples. -->
+Currently has support for 5 servers:
+
+* tsserver
+* pyright
+* kotlin-lsp
+* luals
+* clangd
+
 ## Requirements
 
 * Python 3.10+
-* Linux or Windows (though Windows support may be limited)
+* Linux or Windows (though Windows support is limited)
     * macOS is intentionally not supported
 
 Additionally, the following tools are used, but are optional unless you install packages that depend on it:

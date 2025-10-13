@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import enum
 import os
 import stat
 import subprocess
@@ -7,6 +8,8 @@ import platform
 from lspinstaller.config import Config
 from lspinstaller.constants import LSP_HOME
 from lspinstaller.data import sources
+from lspinstaller.resolver.arch import Arch, Arch, resolve_arch
+from lspinstaller.resolver.arch import resolve_arch
 from lspinstaller.resolver.util.github import default_version_parser, get_release_info
 from lspinstaller.resolver.util.fetch import fetch
 
@@ -21,9 +24,9 @@ def init_data(version: str):
         os=platform.system().lower()
     )
 
-def parse_special(value, data: Data):
+def parse_special(value, data: Data) -> str:
     if not isinstance(value, str):
-        value(data)
+        return value(data)
     else:
         # TODO: This will not scale well. Do not add more fields this way;
         # write a proper replacement engine instead.
@@ -62,12 +65,27 @@ def resolve(package_name, spec, config: Config):
         else:
             pattern = binary["pattern"]
             assert pattern is not None
+            data = init_data(
+                release.tag_name
+            )
+            if isinstance(pattern, dict):
+                pattern  = pattern[data.os]
+
             pattern = parse_special(
                 pattern,
-                init_data(
-                     release.tag_name
-                ),
+                data,
             )
+
+            if "arch" in spec:
+                arch_spec = spec["arch"]
+                arch: Arch = resolve_arch()
+                if arch not in arch_spec["supported"][data.os]:
+                    raise RuntimeError(
+                        f"{package_name} is not supported on {arch}. "
+                        f"Supported: {arch_spec['supported']}"
+                    )
+
+                pattern = pattern.replace("${arch}", arch_spec["parser"](arch))
             url = None
             for asset in release.assets:
                 if asset.name == pattern:

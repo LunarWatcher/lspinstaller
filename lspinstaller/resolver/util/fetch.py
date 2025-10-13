@@ -17,7 +17,16 @@ def fetch(
     returns a string pointing to the root dir for the install.
     """
     if (is_archive):
-        download_dest = tempfile.gettempdir() + "/lspinstaller/" + dest
+        if (is_archive == "auto"):
+            frag = url.split(".")[-2:]
+            if frag[0] == "tar":
+                is_archive = ".".join(frag)
+            else:
+                is_archive = frag[1]
+        download_dest = tempfile.gettempdir() \
+            + "/lspinstaller/" \
+            + dest \
+            + f".{is_archive}"
         os.makedirs(
             tempfile.gettempdir() + "/lspinstaller/",
             exist_ok=True,
@@ -41,6 +50,7 @@ def fetch(
         url,
         download_dest
     )
+    print(f"Downloaded to {loc}")
 
     if not is_archive:
         return loc
@@ -50,6 +60,15 @@ def fetch(
         with zipfile.ZipFile(loc) as archive:
             # TODO: this doesn't really account for root issues. clangd
             # extracts into clangd-<version>
+            archive.extractall(
+                os.path.join(
+                    lsp_base_dir,
+                    dest
+                )
+            )
+    elif is_archive.startswith("tar"):
+        print("Extracting .tar file...")
+        with tarfile.open(loc, "r:*") as archive:
             archive.extractall(
                 os.path.join(
                     lsp_base_dir,
