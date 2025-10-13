@@ -122,7 +122,7 @@ Some special identifiers:
   Note that commands not labelled as STABLE can still be used with CLI use, but
   because that isn't the explicit intent, they'll have a lot more output.
 
-  Stable CLIs are guaranteed to work with $(lsp command ...args) in shell
+  Stable CLIs are guaranteed to work with $(lspinstaller command ...args) in shell
   without needing any additional tweaking.
 """,
         epilog="lspinstaller is licensed under the MIT license: https://codeberg.org/LunarWatcher/lspinstaller/src/branch/master/LICENSE",
@@ -157,7 +157,7 @@ Some special identifiers:
         "find",
         help="QUIET: Returns the path of an LSP server. This CLI is guaranteed to "
         "never change, as it's intended for scripting purposes. For example, "
-        "$(lsp find luals) will always return the absolute path to luals, "
+        "$(lspinstaller find luals) will always return the absolute path to luals, "
         "or exit with -1 if luals is not installed."
     )
     cmd_find.add_argument(
