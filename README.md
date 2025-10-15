@@ -75,3 +75,6 @@ The name used for the `install` command matches the subfolder name in `~/.local/
 
 It is still a manual process though, so it's strongly recommended that you automate it once so you don't have to touch it again. The locations are guaranteed to never change incompatibly.
 
+### How do I configure the servers?
+
+See the documentation for your LSP plugin and/or editor. Some known-good config settings for the servers supported by lspinstaller that works with [yegappan/lsp](https://github.com/yegappan/lsp) can be found [here](https://github.com/LunarWatcher/vimrc-modules/blob/master/autoload/modules/lsp.vim).
