@@ -122,6 +122,12 @@ sources = {
     "tsserver": {
         "npm": {
             "package": "typescript-language-server",
+            "deps": [
+                # We need typescript's tsserver to link to for yegappan/lsp to
+                # work reliably. I'm pretty sure coc.nvim does this
+                # automatically as well
+                "typescript",
+            ],
             "bin": "typescript-language-server"
         }
     },

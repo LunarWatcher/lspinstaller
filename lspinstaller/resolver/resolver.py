@@ -133,8 +133,14 @@ def resolve(package_name, spec, config: Config):
         config.update_package(package_name, release.tag_name)
         return release.tag_name
     elif "npm" in spec:
+        args = ["npm", "install", spec["npm"]["package"]]
+        # TODO: There has to be a shorthand for this
+        if "deps" in spec["npm"]:
+            for dep in spec["npm"]["deps"]:
+                args.append(dep)
+
         subprocess.run(
-            ["npm", "install", spec["npm"]["package"]],
+            args,
             cwd=LSP_HOME
         )
         return None
@@ -155,11 +161,12 @@ def do_update(config: Config):
         )
 
     for package in config.packages:
-        # Nuke the existing tree just in case
         dest = os.path.join(
             LSP_HOME,
             package
         )
+
+        # Nuke the existing tree just in case
         if os.path.exists(dest):
             shutil.rmtree(
                 dest
