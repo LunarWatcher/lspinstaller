@@ -41,6 +41,9 @@ IOU 1x instruction set
 * `lspinstaller list` to see what exists
 * `lspinstaller update` to update LSPs you have installed
 * `lspinstaller install <lsp>` to install new LSPs
+* `lspinstaller find <lsp>` to print the binary path of the provided lsp.
+* `lspinstaller home` to print the root directory where all the LSPs are installed
+    * Copypasta for interactive use: `cd $(lspinstaller home)`
 
 All of these accept `--help`. Additional information is available through `lspinstaller --help`.
 
@@ -76,7 +79,7 @@ In the meanwhile, you need to explicitly specify the full path, and keep track o
 
 The name used for the `install` command matches the subfolder name in `~/.local/share/lsp/`.
 
-It is still a manual process though, so it's strongly recommended that you automate it once so you don't have to touch it again. The locations are guaranteed to never change incompatibly.
+It is still a manual process though, so it's strongly recommended that you automate it once so you don't have to touch it again. The locations are guaranteed to never change incompatibly (barring the LSP itself doing an incompatible change, of course). `lspinstaller find` can also be used if your LSP client supports invoking scripts, and provided you've got `lspinstaller` in your PATH.
 
 ### How do I configure the servers?
 
