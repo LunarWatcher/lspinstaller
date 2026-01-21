@@ -1,8 +1,8 @@
 # Changelog
 
-Only maintained as of v0.2.0
+Changelog only maintained as of v0.2.0. v0.1.0 and earlier are not tracked here
 
-## [v0.2.0] (unreleased)
+## [v0.2.0] (2026-01-21)
 
 ### Added
 
