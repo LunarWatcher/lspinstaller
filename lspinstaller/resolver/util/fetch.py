@@ -5,6 +5,8 @@ import zipfile
 import tarfile
 import tempfile
 
+from loguru import logger
+
 def fetch(
     lsp_base_dir: str,
     url: str,
@@ -45,18 +47,18 @@ def fetch(
         lsp_base_dir,
         dest
     )
-    print(f"Now downloading {url}...")
+    logger.info(f"Now downloading {url}...")
     [loc, response] = request.urlretrieve(
         url,
         download_dest
     )
-    print(f"Downloaded to {loc}")
+    logger.info(f"Downloaded to {loc}")
 
     if not is_archive:
         return loc
 
     if is_archive == "zip":
-        print("Extracting .zip file...")
+        logger.info("Extracting .zip file...")
         with zipfile.ZipFile(loc) as archive:
             # TODO: this doesn't really account for root issues. clangd
             # extracts into clangd-<version>
@@ -67,7 +69,7 @@ def fetch(
                 )
             )
     elif is_archive.startswith("tar"):
-        print("Extracting .tar file...")
+        logger.info("Extracting .tar file...")
         with tarfile.open(loc, "r:*") as archive:
             archive.extractall(
                 os.path.join(
@@ -80,7 +82,7 @@ def fetch(
         raise RuntimeError("archive type not implemented yet")
 
     if is_archive is not None and is_nested:
-        print("Unfucking nested folder")
+        logger.info("Unfucking nested folder")
         folder = os.path.join(
             final_dir,
             os.listdir(final_dir)[0]
@@ -96,5 +98,5 @@ def fetch(
         )
         shutil.rmtree(folder)
 
-    print("Done")
+    logger.info("Done")
     return final_dir

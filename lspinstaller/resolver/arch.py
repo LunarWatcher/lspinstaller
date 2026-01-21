@@ -35,3 +35,10 @@ def simplified_arch(arch: Arch):
         Arch.X86_64: "x64",
         Arch.ARM64: "arm64"
     }[arch]
+
+def simplified_alternate_arm(arch: Arch):
+    return {
+        Arch.X86: "x86",
+        Arch.X86_64: "x64",
+        Arch.ARM64: "aarch64"
+    }[arch]

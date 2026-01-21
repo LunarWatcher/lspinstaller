@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from loguru import logger
 import requests
 import msgspec
 
@@ -23,7 +24,7 @@ def get_release_info(repo_ref: str, version_parser = default_version_parser) -> 
         "https://api.github.com/repos/{}/releases/latest".format(repo_ref)
     )
     if (res.status_code >= 400):
-        print("GitHub says no:", res.text)
+        logger.error("GitHub says no:", res.text)
         exit(-2)
 
     json = msgspec.json.decode(res.text)

@@ -5,13 +5,14 @@ Utility script for installing various LSPs, because software packaging standards
 **Warning:** this is an experimental script that has not been extensively tested. Use with caution. It was hacked together in a single evening/night, and likely has multiple, large problems.
 
 <!-- If this list ever gets Sufficiently Big:tm:, replace with "has support for over X servers, including:" and only some notable examples. -->
-Currently has support for 5 servers:
+Currently has support for 6 servers:
 
 * tsserver
 * pyright
 * kotlin-lsp
 * luals
 * clangd
+* astral-sh/ty
 
 ## Requirements
 
@@ -22,6 +23,7 @@ Currently has support for 5 servers:
 Additionally, the following tools are used, but are optional unless you install packages that depend on it:
 
 * `npm`
+* `python3` with `venv`
 
 ## Installing
 
@@ -56,6 +58,7 @@ Depending on availability:
 
 1. Binary install
 2. Npm install (requires `npm` in PATH)
+3. Pip install (requires `python3` and `venv` for first-time setup)
 
 System package managers are not supported; if you can install via a system package manager, do that instead. This script exists for operating systems where there are no package manager, the package manager doesn't include a given LSP, or the OS is debian-based (or follows a debian-like idiology) where the LSPs that are available are heavily out of date. 
 

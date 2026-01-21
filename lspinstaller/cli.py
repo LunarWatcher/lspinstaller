@@ -4,15 +4,16 @@ import os
 import shutil
 import time
 
+from loguru import logger
+
 from lspinstaller.config import load_config
 from lspinstaller.constants import LSP_HOME
-from lspinstaller.resolver.resolver import resolve
+from lspinstaller.resolver.resolver import resolve, do_update
 from .data import sources
 
 class Arguments(argparse.Namespace):
     package: str | None
     packages: list[str] | None
-
 
 def run_list(_args):
     print(f"There are {len(sources)} available servers.")
@@ -20,28 +21,34 @@ def run_list(_args):
     print('   {0:<30} How installed'.format("Name in lspinstaller"))
     for (name, data) in sources.items():
         builder = f" * {name:<30} "
-        if ("github" in data):
-            builder += f"via GitHub: {data['github']['fragment']}"
-        elif ("npm" in data):
-            builder += f"via npm: {data['npm']['package']}"
+        if (data.github is not None):
+            if data.binary and data.binary.pattern_is_url:
+                builder += f"via URL: {data.binary.pattern}"
+            else:
+                builder += f"via GitHub: {data.github.fragment}"
+        elif (data.npm):
+            builder += f"via npm: {data.npm.package}"
+        elif (data.pip):
+            builder += f"via pip: {data.pip.package}"
         else:
-            builder += "Unknown source. Someone added a type without updating list"
+            builder += "Unknown source. Someone added a type without " \
+                "updating the list command"
         print(builder)
 
 def run_install(args):
     assert args.packages is not None
-    print(f"Installing: {', '.join(args.packages)}")
+    logger.info(f"Installing: {', '.join(args.packages)}")
 
     config = load_config()
 
     for package in args.packages:
         if not package in sources:
-            print(
+            logger.error(
                 f"{package} is not a known lsp. See lspinstaller list for the available LSPs"
             )
             exit(-1)
         elif package in config.packages:
-            print(
+            logger.error(
                 f"{package} has already been installed. Use update instead"
             )
             exit(-1)
@@ -52,7 +59,7 @@ def run_install(args):
     for package in args.packages:
         spec = sources[package]
 
-        if "binary" in spec:
+        if spec.binary:
             output_path = os.path.join(
                 LSP_HOME,
                 package
@@ -60,9 +67,9 @@ def run_install(args):
             if os.path.exists(
                 output_path
             ):
-                print(f"WARNING: {output_path} already exists.")
-                print("This is likely a weird state artefact. The folder will now be removed before the install is attempted")
-                print("If this is a mistake, press CTRL-C to abort NOW!")
+                logger.warning(f"{output_path} already exists.")
+                logger.warning("This is likely a weird state artefact. The folder will now be removed before the install is attempted")
+                logger.warning("If this is a mistake, press CTRL-C to abort NOW!")
 
                 time.sleep(10)
 
@@ -75,7 +82,8 @@ def run_install(args):
 
 
 def run_update(_args):
-    pass
+    config = load_config()
+    do_update(config)
 
 def find_package(args):
     package = args.package
@@ -89,18 +97,24 @@ def find_package(args):
     spec = sources[package]
 
     expected_path: str
-    if "npm" in spec:
+    if spec.npm:
         expected_path = os.path.join(
             LSP_HOME,
             "node_modules",
             ".bin",
-            spec["npm"]["bin"]
+            spec.npm.bin
         )
-    elif "binary" in spec:
+    elif spec.binary:
         expected_path = os.path.join(
             LSP_HOME,
             package,
-            list(spec["binary"]["link"].values())[0]
+            list(spec.binary.link.values())[0]
+        )
+    elif spec.pip:
+        expected_path = os.path.join(
+            LSP_HOME,
+            "env", "bin",
+            package
         )
     else:
         exit(-3)

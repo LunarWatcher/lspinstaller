@@ -1,7 +1,9 @@
+from lspinstaller.data.types import Source, GitHubSpec, BinarySpec, NpmSpec, PipSpec, ArchSpec
+from typing import Optional
 from dataclasses import dataclass
 from enum import Enum
 
-from lspinstaller.resolver.arch import Arch, simplified_arch, simplified_arch
+from lspinstaller.resolver.arch import Arch, simplified_arch, simplified_arch, simplified_alternate_arm
 
 from lspinstaller.resolver.arch import Arch
 
@@ -58,6 +60,9 @@ The npm object contains the following keys:
 The binary object contains the following keys:
 * `pattern`: required when using `github` or another provider that finds
   multiple files. Otherwise optional. Mutually exclusive with `url`
+    * `pattern_is_url` (default: false): only supported when `pattern` is
+      provided. If True, the pattern is not parsed as the pattern of a github
+      release asset, but as a URL based on the release version on GitHub.
 * `url`: required when the object is used with a source that's only used for
   the version. See kotlin-lsp for an example. Mutually exclusive with `pattern`
 * `link`: describes which files to symlink to the special bin directory.
@@ -105,73 +110,90 @@ and the currently recognised values are:
 # requires passing the whole data object  to the lambda, which is just a mess.
 # Lambdas in python are also fairly shit, so that wouldn't be pretty. Maybe
 # there's a light-weight templating language that makes sense to use?
-sources = {
-    "clangd": {
-        "github": {
-            "fragment": "clangd/clangd",
-        },
-        "binary": {
-            "pattern": "clangd-${os}-${version}.zip",
-            "link": {
+sources: dict[str, Source] = {
+    "clangd": Source(
+        github=GitHubSpec(
+            fragment="clangd/clangd",
+        ),
+        binary=BinarySpec(
+            pattern="clangd-${os}-${version}.zip",
+            link= {
                 "clangd": "bin/clangd"
             },
-            "archive": "auto",
-            "is_nested": True
-        }
-    },
-    "tsserver": {
-        "npm": {
-            "package": "typescript-language-server",
-            "deps": [
+            archive =  "auto",
+            is_nested = True
+        )
+    ),
+    "tsserver": Source(
+        npm = NpmSpec(
+            package = "typescript-language-server",
+            deps = [
                 # We need typescript's tsserver to link to for yegappan/lsp to
                 # work reliably. I'm pretty sure coc.nvim does this
                 # automatically as well
                 "typescript",
             ],
-            "bin": "typescript-language-server"
-        }
-    },
-    "pyright": {
-        "npm": {
-            "package": "pyright",
-            "bin": "pyright"
-        }
-    },
-    "kotlin-lsp": {
-        "github": {
-            "fragment": "Kotlin/kotlin-lsp"
-        },
-        "binary": {
-            "url": "https://download-cdn.jetbrains.com/kotlin-lsp/${version}/kotlin-${version}.zip",
-            "link": {
+            bin = "typescript-language-server"
+        )
+    ),
+    "pyright": Source(
+        npm = NpmSpec(
+            package = "pyright",
+            bin = "pyright"
+        )
+    ),
+    "ty": Source(
+        pip = PipSpec(
+            package = "ty",
+            bin = "ty"
+        )
+    ),
+    "kotlin-lsp": Source(
+        github = GitHubSpec(
+            fragment = "Kotlin/kotlin-lsp"
+        ),
+        binary = BinarySpec(
+            pattern = {
+                "linux": "https://download-cdn.jetbrains.com/kotlin-lsp/${version}/kotlin-lsp-${version}-linux-${arch}.zip",
+                "windows": "https://download-cdn.jetbrains.com/kotlin-lsp/${version}/kotlin-lsp-${version}-win-${arch}.zip",
+            },
+            pattern_is_url = True,
+            link = {
                 "kotlin-lsp": "kotlin-lsp.sh"
             },
-            "archive": "auto",
-            "is_nested": False
-        },
-        "version_parser": lambda raw : raw[raw.index("v") + 1:]
-    },
-    "luals": {
-        "github": {
-            "fragment": "luals/lua-language-server"
-        },
-        "binary": {
-            "pattern": {
+            archive = "auto",
+            is_nested = False
+        ),
+        version_parser = lambda raw : raw[raw.index("v") + 1:],
+        arch = ArchSpec(
+            supported = {
+                "windows": [Arch.X86_64, Arch.ARM64],
+                "linux": [Arch.X86_64, Arch.ARM64]
+            },
+            parser = simplified_alternate_arm,
+        ),
+    ),
+    "luals": Source(
+        github = GitHubSpec(
+            fragment = "luals/lua-language-server"
+        ),
+        binary = BinarySpec(
+            pattern = {
                 "linux": "lua-language-server-${version}-linux-${arch}.tar.gz",
                 "windows": "lua-language-server-${version}-win32-${arch}.zip"
             },
-            "link": {
+            link = {
                 "lua-language-server": "bin/lua-language-server"
             },
-            "archive": "auto",
-            "is_nested": False
-        },
-        "arch": {
-            "supported": {
+            archive = "auto",
+            is_nested = False
+        ),
+        arch = ArchSpec(
+            supported = {
                 "windows": [Arch.X86_64],
                 "linux": [Arch.X86_64, Arch.ARM64]
             },
-            "parser": simplified_arch,
-        },
-    }
+            parser = simplified_arch,
+        ),
+    )
 }
