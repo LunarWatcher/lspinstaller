@@ -18,6 +18,8 @@ dependencies = [
 
     # Serialization (largely for config and persistent state)
     "msgspec>=0.19.0"
+
+    "loguru"
 ]
 readme = "README.md"
 

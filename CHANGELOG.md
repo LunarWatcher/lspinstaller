@@ -1,6 +1,11 @@
 # Changelog
 
 Changelog only maintained as of v0.2.0. v0.1.0 and earlier are not tracked here
+## [v0.2.1] (2026-03-08)
+
+### Fixed
+
+* Added loguru as a dependency to pyproject so the pypi version works properly
 
 ## [v0.2.0] (2026-01-21)
 
@@ -23,4 +28,5 @@ Changelog only maintained as of v0.2.0. v0.1.0 and earlier are not tracked here
     * This was required for the kotlin-lsp fix, which also split the filenames into OS-specific versions. Thanks, JetBrains
 
 
+[v0.2.1]: https://github.com/LunarWatcher/lspinstaller/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/LunarWatcher/lspinstaller/compare/v0.1.0...v0.2.0
