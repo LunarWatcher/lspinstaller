@@ -1,5 +1,7 @@
 # LSP installer
 
+> **Archival note:** This repo is axed because I now use arch everywhere, and arch gives sufficiently up to date LSP packages. Additionally, kotlin-lsp has broken again and I cannot be bothered fixing it
+
 Utility script for installing various LSPs, because software packaging standards still fucking suck.
 
 **Warning:** this is an experimental script that has not been extensively tested. Use with caution. It was hacked together in a single evening/night, and likely has multiple, large problems.
